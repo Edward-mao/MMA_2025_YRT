@@ -1,0 +1,45 @@
+# Core Dependencies
+simpy>=4.0.1
+pyspark>=3.3.0
+pyyaml>=6.0
+dataclasses>=0.6
+
+# Data Processing
+pandas>=1.5.0
+numpy>=1.23.0
+
+# Visualization
+matplotlib>=3.5.0
+seaborn>=0.12.0
+
+# Testing
+pytest>=7.2.0
+pytest-benchmark>=3.4.1
+pytest-cov>=4.0.0
+
+# Development Tools (Optional)
+black>=22.10.0
+isort>=5.10.1
+pylint>=2.15.0
+mypy>=0.990
+flake8>=5.0.4
+
+# Performance Analysis (Optional)
+snakeviz>=2.1.1
+memory-profiler>=0.60.0
+
+# Logging and Monitoring
+colorlog>=6.7.0
+
+# Other Tools
+pipdeptree>=2.3.3
+
+statsmodels>=0.12.0
+pmdarima>=1.8.0
+psutil
+requests
+osmium
+pyproj
+lxml
+geopy
+openpyxl 

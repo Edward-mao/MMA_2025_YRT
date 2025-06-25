@@ -1,0 +1,88 @@
+# Bus Simulation Data Pipeline Configuration File
+# Database Connection and Spark Configuration
+
+database:
+  # SQL Server Connection Configuration
+  server: 'localhost'          # 或 '.'，也可以写成 你的电脑名
+  database: 'BusSim'
+  driver: '{ODBC Driver 17 for SQL Server}'   # 按照你系统安装的版本填写 17 或 18
+  table: dbo.BusTrip # Target table
+  batch_size: 5000   # Increase batch size for better efficiency
+  connection_timeout: 60  # Increase connection timeout
+  
+  # Alternate connection method (if username/password is required)
+  # username: your_username
+  # password: your_password
+  # authentication: sql  # 'windows' or 'sql'
+
+spark:
+  # Spark Configuration
+  app_name: BusTripETL
+  master: local[*]  # Local mode, use all cores
+  shuffle_partitions: 100  # Reduce partition count to improve performance on small datasets
+  adaptive_enabled: true
+  
+  # Memory Configuration - Increase memory allocation
+  driver_memory: 16g
+  executor_memory: 16g
+  
+  # Performance Optimization
+  sql_adaptive_coalesce_partitions: true
+  sql_adaptive_skew_join: true
+  
+  # New Optimization Configuration
+  serializer: org.apache.spark.serializer.KryoSerializer
+  sql_adaptive_enabled: true
+  sql_adaptive_localShuffleReader_enabled: true
+  
+  # Debugging and Logging Configuration - Resolve query plan truncation warning
+  sql_debug_maxToStringFields: 100  # Increase field display limit, default is 25
+  sql_planChangeLog_level: WARN     # Reduce plan change logs
+  sql_planChangeLog_batches: 5      # Limit plan change log batches
+
+data_quality:
+  # Data Quality Thresholds
+  max_speed_kmh: 120  # Maximum speed (km/h)
+  max_dwell_time_seconds: 600  # Maximum dwell time (seconds)
+  min_trip_time_seconds: 60  # Minimum trip time (seconds)
+  
+etl:
+  # ETL Processing Configuration
+  checkpoint_dir: ./checkpoint
+  fallback_dir: ./fallback_data
+  log_level: INFO
+  
+  # Streaming Processing Configuration - Optimize performance
+  streaming:
+    trigger_interval: 0s  # Increase to 60s to allow more processing time
+    max_files_per_trigger: 50  # Reduce number of files per trigger
+    max_offsets_per_trigger: 1000  # Limit number of records per trigger
+  
+  # Parquet File Compression Configuration
+  compression:
+    enabled: true  # Enable compression feature
+    delete_original_after_compression: true  # Delete original parquet directory after compression
+    compression_level: 6  # Compression level (1-9, 1=fastest, 9=smallest)
+    
+monitoring:
+  # Monitoring Configuration
+  enable_metrics: true
+  metrics_port: 4040
+  
+# Environment-Specific Configuration
+environments:
+  development:
+    database:
+      server: localhost
+      database: BusSim_Dev
+    spark:
+      master: local[2]
+      
+  production:
+    database:
+      server: prod-sql-server
+      database: BusSim
+    spark:
+      master: spark://spark-master:7077
+      driver_memory: 8g
+      executor_memory: 8g 

@@ -1,0 +1,72 @@
+logging:
+  level: DEBUG
+paths:
+  output:
+    debug_log_file: logs/simulation_debug.txt
+    info_log_file: logs/simulation_info.csv
+    log_dir: logs/
+  simpy_data:
+    arrival_rates_file: '{scenario_name}/trail/arrival_rate.json'
+    destination_weights_file: '{scenario_name}/trail/weights.json'
+    stop_mapping_file: '{scenario_name}/stop_mapping.json'
+    stops_file: '{scenario_name}/trail/stops.json'
+    timetable_file: '{scenario_name}/timetable/{scenario_name}_timetable.json'
+  sumo_scenario:
+    config_file: '{scenario_name}/SUMO/simulation.sumocfg'
+scenarios:
+  '050':
+    name: Route 050 - York Region
+    stop_id_mapping_file: data/050/stop_mapping.json
+    target_route_id: '050'
+  096:
+    name: Route 096 - York Region
+    stop_id_mapping_file: data/096/stop_mapping.json
+    target_route_id: 096
+  '601':
+    name: Route 601 - York Region
+    stop_id_mapping_file: data/601/stop_mapping.json
+    target_route_id: '601'
+  '603':
+    name: Route 603 - York Region
+    stop_id_mapping_file: data/603/stop_mapping.json
+    target_route_id: '603'
+  '605':
+    name: Route 605 - York Region
+    stop_id_mapping_file: data/605/stop_mapping.json
+    target_route_id: '605'
+  '607':
+    name: Route 607 - York Region
+    stop_id_mapping_file: data/607/stop_mapping.json
+    target_route_id: '607'
+simpy:
+  scheduler:
+    adaptive:
+      demand_threshold: 20
+      enable_kpi: true
+      export_interval: 3600
+      headway_tolerance: 0.15
+      kpi_refresh_interval: 300
+      max_hold: 60
+      otp_window: 600
+    adaptive_headway:
+      beta_target: 1.0
+      bus_capacity: 75
+      enable_kpi: true
+      h_max: 1800
+      h_min: 600
+      headway_tolerance: 0.2
+      kpi_export_interval: 3600
+      max_hold: 30
+    interval:
+      default_interval: 1800
+      off_peak_interval: 3600
+      peak_interval: 600
+    timetable:
+      skip_late_threshold: 1200
+    type: adaptive_headway
+simulation:
+  data_target: scenario
+  end_time_seconds: 86400
+  num_rounds: 1
+  random_seed: 34
+  start_time_seconds: 18000
