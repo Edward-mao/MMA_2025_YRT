@@ -9,7 +9,7 @@ import yaml
 import time
 from pathlib import Path
 from typing import Dict, List, Any, Optional
-import shutil  # 新增，用于删除文件夹
+import shutil  # Added for folder deletion
 from datetime import datetime
 
 # Ensure script can find the simulation package
@@ -32,7 +32,7 @@ from simulation.config import DISPATCH_INTERVAL_SECONDS, BUS_CAPACITY
 # Initialize logging as early as possible, right after imports.
 setup_logging()
 
-# 只使用libsumo
+# Use only libsumo
 import libsumo as traci
 
 # Global variable to store the active scheduler instance
@@ -125,7 +125,7 @@ class SimulationRunner:
             traci.start(sumo_cmd)
             self.logger.info("libsumo connection started successfully.")
             
-            # 测试连接
+            # Test connection
             version = traci.getVersion()
             self.logger.info(f"Connected to SUMO version: {version}")
             
@@ -952,9 +952,9 @@ def main():
                         streaming_query.processAllAvailable()
                     simulation.logger.info("Stopping streaming query...")
                     streaming_query.stop()
-                    # 等待查询完全终止，防止 Spark 仍在心跳导致 BlockManager 异常
+                    # Wait for query to fully terminate to prevent BlockManager exceptions from Spark heartbeat
                     try:
-                        streaming_query.awaitTermination(60000)  # 最长等待 60 秒
+                        streaming_query.awaitTermination(60000)  # Maximum wait 60 seconds
                         simulation.logger.info("Streaming query terminated cleanly")
                     except Exception as e:
                         simulation.logger.warning(f"Streaming query termination timed out or failed: {e}")

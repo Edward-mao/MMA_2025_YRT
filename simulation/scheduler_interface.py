@@ -1,6 +1,6 @@
 """
-调度器接口定义
-提供统一的调度器抽象接口，使得调度逻辑与系统其他部分解耦
+Scheduler interface definition
+Provides unified scheduler abstraction interface to decouple scheduling logic from other system components
 """
 from abc import ABC, abstractmethod
 from typing import List, Dict, Any, Optional, Callable

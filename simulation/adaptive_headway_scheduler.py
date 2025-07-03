@@ -22,7 +22,7 @@ class AdaptiveHeadwayScheduler(SchedulerInterface):
     Once a bus is dispatched, its headway remains fixed throughout the trip.
     """
     
-    # 定义每条路线监测的站点
+    # Define monitored stops for each route
     MONITORED_STOPS = {
         '601001': ['9769', '9770', '9723'],
         '601002': ['9819', '9883']

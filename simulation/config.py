@@ -16,7 +16,7 @@ DISABLED_ALIGHTING_TIME = 45.0  # Time for each disabled passenger to alight (se
 # Vehicle capacity constants
 REGULAR_CAPACITY_COST = 1            # Regular passenger occupies 1 capacity unit
 DISABLED_CAPACITY_COST = 2           # Disabled passenger (e.g., wheelchair) occupies 2 capacity units
-BUS_CAPACITY = 39                    # Maximum vehicle capacity (in capacity units, not seats)
+BUS_CAPACITY = 75                    # Maximum vehicle capacity (in capacity units, not seats)
 MAX_DISABLED_PASSENGERS_PER_BUS = 1  # Maximum number of disabled passengers allowed per bus
 
 # Passenger generation related

@@ -2,23 +2,24 @@
 
 This project is a high-fidelity bus system simulation platform built on SimPy and SUMO, specifically designed to simulate, analyze, and optimize bus operations in York Region. The system combines discrete-event simulation with microscopic traffic flow simulation, supports multiple scheduling strategies, enables precise passenger demand modeling, and writes simulation results directly to a SQL Server database for in-depth analysis.
 
-## 📋 Table of Contents
+## Table of Contents
 
-- [✨ Core Features](#-core-features)
-- [🏗️ System Architecture](#️-system-architecture)
-- [📦 System Requirements](#-system-requirements)
-- [🚀 Quick Start](#-quick-start)
-- [⚙️ Configuration Details](#️-configuration-details)
-- [🕹️ Running Simulations](#️-running-simulations)
-- [📈 Scheduling Strategies](#-scheduling-strategies)
-- [📊 Data Processing](#-data-processing)
-- [📁 Project Structure](#-project-structure)
-- [🔧 Tools & Scripts](#-tools--scripts)
-- [📝 Documentation Index](#-documentation-index)
-- [🔍 Troubleshooting](#-troubleshooting)
-- [🤝 Contribution Guide](#-contribution-guide)
+- [Core Features](#core-features)
+- [System Architecture](#system-architecture)
+- [System Requirements](#system-requirements)
+- [Quick Start](#quick-start)
+- [Configuration Details](#configuration-details)
+- [Running Simulations](#running-simulations)
+- [Scheduling Strategies](#scheduling-strategies)
+- [Data Processing](#data-processing)
+- [Project Structure](#project-structure)
+- [Tools & Scripts](#tools--scripts)
+- [601 Route Scripts and Data](#601-route-scripts-and-data)
+- [Documentation Index](#documentation-index)
+- [Troubleshooting](#troubleshooting)
+- [Contribution Guide](#contribution-guide)
 
-## ✨ Core Features
+## Core Features
 
 ### Simulation Capabilities
 - **Co-simulation**: Deep integration of SimPy's discrete-event simulation with SUMO's microscopic traffic flow simulation for a high-fidelity transit environment.
@@ -40,7 +41,7 @@ This project is a high-fidelity bus system simulation platform built on SimPy an
 - **Baseline Comparison**: Allows saving specific configurations as a baseline (in the `Baseline` table) for easy evaluation of strategy optimization.
 - **KPI Tracking**: Tracks key metrics in real-time, such as headway adjustments, demand forecasts, and load factors.
 
-## 🏗️ System Architecture
+## System Architecture
 
 The system features a modular design with the following core components:
 
@@ -88,7 +89,7 @@ graph TD
 4.  **[Data Hook][[memory:4069272448243752535]]**: An enhanced data collection system that supports comprehensive trip data logging.
 5.  **[Bi-directional Stop Mapping][[memory:2071778652114265656]]**: Supports separate stop mapping configurations for northbound and southbound routes.
 
-## 📦 System Requirements
+## System Requirements
 
 ### Base Environment
 - **OS**: Windows 10/11, Linux, macOS
@@ -112,7 +113,7 @@ pandas>=1.3.0
 ```
 See `requirements.txt` for the full list.
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Install Dependencies
 ```bash
@@ -156,7 +157,7 @@ python run_simulation_simple.py
 python simulation/simulation_runner.py
 ```
 
-## ⚙️ Configuration Details
+## Configuration Details
 
 ### Main Configuration File (config.yml)
 
@@ -206,7 +207,7 @@ spark:
   executor_memory: 16g
 ```
 
-## 🕹️ Running Simulations
+## Running Simulations
 
 ### Single-Round Simulation
 The simplest way to run a simulation:
@@ -236,7 +237,7 @@ simulation:
 
 3. Use SQL queries to compare the results.
 
-## 📈 Scheduling Strategies
+## Scheduling Strategies
 
 ### 1. Timetable Scheduling
 - File Path: `601/timetable/601001_timetable.json` (Northbound)
@@ -254,7 +255,7 @@ simulation:
 - Formula: `h* = max(h_min, min(h_max, (β* × C) / (Σλ̂/n)))`
 - Feature: Headway is fixed upon dispatch; holding is applied only if the bus is running too fast.
 
-## 📊 Data Processing
+## Data Processing
 
 ### Data Flow
 1.  **Event Generation**: SimPy simulation produces events.
@@ -271,7 +272,7 @@ Key fields include:
 - Performance Metrics: SCHED_TRIP_TIME, ACT_TRIP_TIME, DIFF_TRIP_TIME
 - Passenger Metrics: BOARDING, ALIGHTING, LOAD
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 Simulation/
@@ -305,7 +306,7 @@ Simulation/
 └── requirements.txt
 ```
 
-## 🔧 Tools & Scripts
+## Tools & Scripts
 
 ### Database Tools
 - `check_database.py`: Checks and creates database tables.
@@ -313,59 +314,141 @@ Simulation/
 - `config/create_baseline_table.sql`: Creates the `Baseline` table.
 
 ### Data Processing Tools
-- `601/filter_arrival_rate.py`: Filters arrival rate data.
 - `601/generate_stop_mapping.py`: Generates stop mappings.
 
 ### Simulation Scripts
 - `run_simulation_simple.py`: A simplified simulation startup script.
 - `simulation/simulation_runner.py`: The main program for full simulations.
 
-## 📝 Documentation Index
+## 601 Route Scripts and Data
 
-- [Quick Start Guide](Documents/QUICK_START.md)
-- [Simplified Adaptive Scheduler](Documents/SIMPLIFIED_ADAPTIVE_HEADWAY_SCHEDULER.md)
-- [Multi-Round Simulation Guide](Documents/MULTI_ROUND_SIMULATION.md)
-- [Database Migration Guide](Documents/PARQUET_TO_DATABASE_MIGRATION.md)
-- [Scheduler Architecture](simulation/scheduler_architecture.md)
+The 601 folder contains specialized scripts, configuration files, and data for Route 601 (York Region). This folder includes all necessary files required to run Route 601 simulations.
 
-## 🔍 Troubleshooting
+### Core Scripts
 
-### Common Issues
+#### Root Level Scripts
+- **`generate_stop_mapping.py`**: Automatic stop mapping file generation script
+  - **Function**: Creates mapping relationships between real stop IDs and SUMO stop IDs
+  - **Usage**: `python generate_stop_mapping.py [--route_id 601] [--output stop_mapping.json]`
+  - **Inputs**: GTFS data, SUMO stops file, route stops file
+  - **Output**: `stop_mapping.json` file with bidirectional stop mappings
 
-1.  **SUMO Connection Failed**
-    - Ensure SUMO is installed and added to the system PATH.
-    - Check that the `simulation.sumocfg` path is correct.
+#### SUMO Processing Scripts
+- **`SUMO/tls.py`**: Traffic light duplication removal utility
+  - **Function**: Identifies and removes duplicate traffic lights that are too close to each other
+  - **Usage**: `python3 tls.py raw.net.xml`
+  - **Output**: `removeTLS.txt` file containing traffic light IDs to be removed
+  - **Threshold**: 15-meter distance threshold for detecting duplicates
 
-2.  **Database Write Failed**
-    - Run `python check_database.py` to check the connection.
-    - Confirm the SQL Server service is running.
-    - Check firewall settings.
+- **`SUMO/filter.py`**: GTFS data filtering by route
+  - **Function**: Filters complete GTFS datasets to extract data for specific routes
+  - **Usage**: `python filter.py 601 --input google_transit.zip`
+  - **Features**: Filters routes, trips, stop_times, and stops for the specified route
+  - **Output**: Route-specific GTFS zip file (`google_transit_601.zip`)
 
-3.  **[Out of Memory][[memory:2714273344898249620]]**
-    - Adjust Spark memory settings.
-    - Reduce the simulation duration or number of rounds.
+- **`SUMO/generate_random_traffic.py`**: Random background traffic generator
+  - **Function**: Generates realistic background traffic for SUMO simulations
+  - **Usage**: `python generate_random_traffic.py --factor 1.0 --mode mixed --seed 42`
+  - **Modes**: 
+    - `mixed`: Peak and off-peak periods throughout 24 hours
+    - `peak`: Uniform high-density traffic
+    - `offpeak`: Uniform low-density traffic
+  - **Output**: `random_routes.rou.xml` and `random_vtypes.xml`
 
-4.  **[Duplicate Stop Records][[memory:7917273368786763443]]**
-    - This has been fixed in `bus.py`; ensure you are using the latest code.
+- **`SUMO/clean_routes.py`**: Route file post-processing utility
+  - **Function**: Cleans SUMO route files by removing unwanted elements
+  - **Usage**: `python clean_routes.py --input routes_601.rou.xml --output routes_601_clean.rou.xml`
+  - **Operations**:
+    - Removes routes with ".trimmed" suffix
+    - Removes static vehicle definitions
+    - Removes fixed timing attributes from stops
 
-## 🤝 Contribution Guide
+### Configuration Files
+- **`stop_mapping.json`**: Stop mapping configuration file
+  - Contains SimPy to SUMO stop ID mappings
+  - Supports bidirectional routes (northbound and southbound) with independent mappings
+  - Defines SUMO route configurations
 
-Contributions and suggestions are welcome! Please follow these principles:
-- [Maintain Code Integration][[memory:7690919239635767521]]: New features should be integrated into existing files.
-- Run tests before submitting to ensure functionality.
-- Update relevant documentation.
+### Data Directories
 
-## 📄 License
+#### SUMO/ - SUMO Simulation Network Files
+- **Network Files**:
+  - `cleaned.net.xml`: Cleaned road network file
+  - `raw.net.xml`: Original road network file
+  - `interpreter.osm`: OpenStreetMap source data
+- **Route Files**:
+  - `routes_601.rou.xml`: Route 601 specific route definitions
+  - `routes.rou.xml`: General route file
+  - `random_routes.rou.xml`: Randomly generated background traffic routes
+- **Stop Files**:
+  - `stops_601.add.xml`: Route 601 stop definitions
+- **Configuration Files**:
+  - `simulation.sumocfg`: SUMO simulation configuration
+  - `vtypes.xml`: Vehicle type definitions
+  - `random_vtypes.xml`: Random vehicle type definitions
+- **PowerShell Scripts**:
+  - `pre_process.ps1`: Preprocessing PowerShell script for network setup
+- **GTFS Data**:
+  - `google_transit_601/`: Extracted GTFS data directory
+  - `google_transit_601.zip`: Route 601 GTFS data package
+  - `google_transit.zip`: General GTFS data package
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+#### timetable/ - Timetable Data
+- **`601001_timetable.json`**: Northbound (601001) timetable file
+  - Contains complete northbound trip schedules
+  - Organized by stop sequence and departure times
+- **`601002_timetable.json`**: Southbound (601002) timetable file
+  - Contains complete southbound trip schedules
+  - Organized by stop sequence and departure times
 
-## 👥 Team
+#### trail/ - Passenger Demand Data
+- **`arrival_rate.json`**: Passenger arrival rate data
+  - Contains real-time passenger arrival rates for each stop
+  - Organized by time periods and stops for demand forecasting
+- **`arrival_rate_backup.json`**: Arrival rate data backup
+  - Original or backup version of arrival rate data
+- **`stops.json`**: Detailed stop information
+  - Contains all stop IDs, names, locations, and other metadata
+  - Defines stop sequences and directions within routes
+- **`weights.json`**: Passenger weight data
+  - Contains passenger weight coefficients for different time periods and stops
+  - Used for demand modeling and load factor predictions
 
-- Development Team: York Region Transit Planning
-- Technical Support: Rotman School of Management
+### Usage Instructions
 
----
+1. **Generate Stop Mappings**:
+   ```bash
+   cd 601
+   python generate_stop_mapping.py --route_id 601 --output stop_mapping.json
+   ```
 
-**Version**: 2.0.0
-**Last Updated**: 2024-01-15
-**Status**: Production Ready 
+2. **Filter GTFS Data**:
+   ```bash
+   cd 601/SUMO
+   python filter.py 601 --input google_transit.zip
+   ```
+
+3. **Generate Background Traffic**:
+   ```bash
+   cd 601/SUMO
+   python generate_random_traffic.py --factor 1.5 --mode mixed --seed 42
+   ```
+
+4. **Clean Route Files**:
+   ```bash
+   cd 601/SUMO
+   python clean_routes.py --input routes_601.rou.xml --output routes_601_clean.rou.xml
+   ```
+
+5. **Remove Duplicate Traffic Lights**:
+   ```bash
+   cd 601/SUMO
+   python3 tls.py raw.net.xml
+   # This generates removeTLS.txt with traffic light IDs to remove
+   ```
+
+6. **Run Simulation**:
+   ```bash
+   # From project root directory
+   python run_simulation_simple.py
+   ```

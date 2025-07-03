@@ -1,85 +1,85 @@
--- 公交行程数据表创建脚本
--- 适用于SQL Server 2016+
+-- Bus trip data table creation script
+-- For SQL Server 2016+
 
--- 创建数据库（如果不存在）
+-- Create database (if not exists)
 IF NOT EXISTS (SELECT * FROM sys.databases WHERE name = 'BusSim')
 BEGIN
     CREATE DATABASE BusSim
-    COLLATE Chinese_PRC_CI_AS;
+    COLLATE SQL_Latin1_General_CP1_CI_AS;
 END
 GO
 
 USE BusSim;
 GO
 
--- 创建架构（如果不存在）
+-- Create schema (if not exists)
 IF NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'dbo')
 BEGIN
     EXEC('CREATE SCHEMA dbo');
 END
 GO
 
--- 删除旧表（如果存在）
+-- Drop old table (if exists)
 IF OBJECT_ID('dbo.BusTrip', 'U') IS NOT NULL
     DROP TABLE dbo.BusTrip;
 GO
 
--- 创建公交行程表
+-- Create bus trip table
 CREATE TABLE dbo.BusTrip (
-    -- 主键
-    SIGNID NVARCHAR(100) NOT NULL PRIMARY KEY,  -- 唯一记录ID
+    -- Primary key
+    SIGNID NVARCHAR(100) NOT NULL PRIMARY KEY,  -- Unique record ID
     
-    -- 时间维度
-    OPD_DATE DATE NOT NULL,                      -- 运营日期
-    WEEKDAY INT NOT NULL CHECK (WEEKDAY BETWEEN 1 AND 7),  -- 星期几
-    BLOCK NVARCHAR(50) NOT NULL,                 -- 时间段
+    -- Time dimensions
+    OPD_DATE DATE NOT NULL,                      -- Operating date
+    WEEKDAY INT NOT NULL CHECK (WEEKDAY BETWEEN 1 AND 7),  -- Day of week
+    BLOCK NVARCHAR(50) NOT NULL,                 -- Time block
     
-    -- 线路信息
-    LINEABBR NVARCHAR(20) NOT NULL,              -- 线路ID
-    DIRECTION NVARCHAR(20) NOT NULL,             -- 方向
-    TRIP_ID_INT NVARCHAR(100) NOT NULL,          -- 行程ID
+    -- Route information
+    LINEABBR NVARCHAR(20) NOT NULL,              -- Route ID
+    DIRECTION NVARCHAR(20) NOT NULL,             -- Direction
+    TRIP_ID_INT NVARCHAR(100) NOT NULL,          -- Trip ID
     
-    -- 站点信息
-    STOPABBR NVARCHAR(50),                       -- 站点缩写
-    SEQUENCE INT,                                -- 站点序号
+    -- Stop information
+    STOPABBR NVARCHAR(50),                       -- Stop abbreviation
+    SEQUENCE INT,                                -- Stop sequence number
     
-    -- 时间指标
-    SCHED_TRIP_TIME DECIMAL(10,2),               -- 计划行程时间（秒）
-    ACT_TRIP_TIME DECIMAL(10,2),                 -- 实际行程时间（秒）
-    DIFF_TRIP_TIME DECIMAL(10,2),                -- 行程时间差（秒）
+    -- Time metrics
+    SCHED_TRIP_TIME DECIMAL(10,2),               -- Scheduled trip time (seconds)
+    ACT_TRIP_TIME DECIMAL(10,2),                 -- Actual trip time (seconds)
+    DIFF_TRIP_TIME DECIMAL(10,2),                -- Trip time difference (seconds)
     
-    -- 距离和速度
-    SCHED_DISTANCE DECIMAL(10,2),                -- 计划距离（米）
-    ACT_SPEED DECIMAL(6,2),                      -- 实际速度（km/h）
+    -- Distance and speed
+    SCHED_DISTANCE DECIMAL(10,2),                -- Scheduled distance (meters)
+    ACT_SPEED DECIMAL(6,2),                      -- Actual speed (km/h)
     
-    -- 车辆状态
-    IS_ADDITIONAL BIT NOT NULL DEFAULT 0,        -- 是否为增派车辆
+    -- Vehicle status
+    IS_ADDITIONAL BIT NOT NULL DEFAULT 0,        -- Whether additional vehicle
     
-    -- 到站和离站时间
-    SCHED_ARR_TIME DECIMAL(10,2),                -- 计划到达时间（秒）
-    ACT_ARR_TIME DECIMAL(10,2),                  -- 实际到达时间（秒）
-    SCHED_DEP_TIME DECIMAL(10,2),                -- 计划离站时间（秒）
-    ACT_DEP_TIME DECIMAL(10,2),                  -- 实际离站时间（秒）
-    DIFF_DEP_TIME DECIMAL(10,2),                 -- 离站时间差（秒）
+    -- Arrival and departure times
+    SCHED_ARR_TIME DECIMAL(10,2),                -- Scheduled arrival time (seconds)
+    ACT_ARR_TIME DECIMAL(10,2),                  -- Actual arrival time (seconds)
+    SCHED_DEP_TIME DECIMAL(10,2),                -- Scheduled departure time (seconds)
+    ACT_DEP_TIME DECIMAL(10,2),                  -- Actual departure time (seconds)
+    DIFF_DEP_TIME DECIMAL(10,2),                 -- Departure time difference (seconds)
     
-    -- 停站信息
-    DWELL_TIME DECIMAL(10,2),                    -- 停站时间（秒）
-    DISTANCE_TO_NEXT DECIMAL(10,2),              -- 到下一站距离（米）
-    DISTANCE_TO_TRIP DECIMAL(10,2),              -- 到终点站距离（米）
+    -- Stop information
+    DWELL_TIME DECIMAL(10,2),                    -- Dwell time (seconds)
+    DISTANCE_TO_NEXT DECIMAL(10,2),              -- Distance to next stop (meters)
+    DISTANCE_TO_TRIP DECIMAL(10,2),              -- Distance to trip end (meters)
     
-    -- 乘客信息
-    BOARDING INT NOT NULL DEFAULT 0,             -- 上车人数
-    ALIGHTING INT NOT NULL DEFAULT 0,            -- 下车人数
-    LOAD INT NOT NULL DEFAULT 0,                 -- 车载人数
-    WHEELCHAIR_COUNT INT NOT NULL DEFAULT 0,     -- 轮椅乘客数
+    -- Passenger information
+    BOARDING INT NOT NULL DEFAULT 0,             -- Boarding count
+    ALIGHTING INT NOT NULL DEFAULT 0,            -- Alighting count
+    LOAD INT NOT NULL DEFAULT 0,                 -- Load count
+    WHEELCHAIR_COUNT INT NOT NULL DEFAULT 0,     -- Wheelchair passenger count
     
-    -- 审计字段
-    CREATED_AT DATETIME2 DEFAULT GETDATE(),      -- 创建时间
-    UPDATED_AT DATETIME2 DEFAULT GETDATE()       -- 更新时间
+    -- Audit fields
+    CREATED_AT DATETIME2 DEFAULT GETDATE(),      -- Creation time
+    UPDATED_AT DATETIME2 DEFAULT GETDATE()       -- Update time
 );
 GO
 
--- 创建索引以提高查询性能
+-- Create indexes to improve query performance
 CREATE NONCLUSTERED INDEX IX_BusTrip_OPD_DATE 
     ON dbo.BusTrip(OPD_DATE);
 GO
@@ -96,13 +96,13 @@ CREATE NONCLUSTERED INDEX IX_BusTrip_BLOCK
     ON dbo.BusTrip(BLOCK);
 GO
 
--- 创建复合索引
+-- Create composite index
 CREATE NONCLUSTERED INDEX IX_BusTrip_Line_Date 
     ON dbo.BusTrip(LINEABBR, OPD_DATE) 
     INCLUDE (BOARDING, ALIGHTING, LOAD);
 GO
 
--- 创建汇总视图
+-- Create summary view
 CREATE VIEW dbo.vw_DailyLineSummary AS
 SELECT 
     OPD_DATE,
@@ -121,7 +121,7 @@ FROM dbo.BusTrip
 GROUP BY OPD_DATE, LINEABBR, DIRECTION;
 GO
 
--- 创建时段汇总视图
+-- Create time block summary view
 CREATE VIEW dbo.vw_BlockSummary AS
 SELECT 
     BLOCK,
@@ -134,7 +134,7 @@ FROM dbo.BusTrip
 GROUP BY BLOCK, LINEABBR;
 GO
 
--- 创建存储过程：数据质量检查
+-- Create stored procedure: data quality check
 CREATE PROCEDURE dbo.sp_CheckDataQuality
     @StartDate DATE = NULL,
     @EndDate DATE = NULL
@@ -142,38 +142,38 @@ AS
 BEGIN
     SET NOCOUNT ON;
     
-    -- 默认检查最近7天
+    -- Default check last 7 days
     IF @StartDate IS NULL
         SET @StartDate = DATEADD(DAY, -7, GETDATE());
     IF @EndDate IS NULL
         SET @EndDate = GETDATE();
     
-    -- 检查异常速度
+    -- Check abnormal speed
     SELECT 'Abnormal Speed' AS Issue, COUNT(*) AS Count
     FROM dbo.BusTrip
     WHERE OPD_DATE BETWEEN @StartDate AND @EndDate
         AND (ACT_SPEED > 120 OR ACT_SPEED < 0);
     
-    -- 检查异常停站时间
+    -- Check abnormal dwell time
     SELECT 'Abnormal Dwell Time' AS Issue, COUNT(*) AS Count
     FROM dbo.BusTrip
     WHERE OPD_DATE BETWEEN @StartDate AND @EndDate
         AND (DWELL_TIME > 600 OR DWELL_TIME < 0);
     
-    -- 检查乘客数据一致性
+    -- Check passenger data consistency
     SELECT 'Passenger Count Inconsistency' AS Issue, COUNT(*) AS Count
     FROM dbo.BusTrip
     WHERE OPD_DATE BETWEEN @StartDate AND @EndDate
         AND WHEELCHAIR_COUNT > LOAD;
     
-    -- 检查重复记录
+    -- Check duplicate records
     SELECT 'Duplicate Records' AS Issue, COUNT(*) - COUNT(DISTINCT SIGNID) AS Count
     FROM dbo.BusTrip
     WHERE OPD_DATE BETWEEN @StartDate AND @EndDate;
 END;
 GO
 
--- 创建触发器：更新时间戳
+-- Create trigger: update timestamp
 CREATE TRIGGER trg_UpdateTimestamp
 ON dbo.BusTrip
 AFTER UPDATE
@@ -187,9 +187,9 @@ BEGIN
 END;
 GO
 
--- 授权（根据需要调整）
+-- Grant permissions (adjust as needed)
 -- GRANT SELECT, INSERT, UPDATE ON dbo.BusTrip TO [spark_user];
 -- GO
 
-PRINT '数据库表创建完成！';
+PRINT 'Database table creation completed!';
 GO 

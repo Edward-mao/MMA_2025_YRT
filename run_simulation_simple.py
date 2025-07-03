@@ -1,10 +1,10 @@
 """
-简化的模拟运行脚本（不包含ETL）
+Simplified simulation run script (without ETL)
 """
 import sys
 import os
 
-# 确保能找到simulation包
+# Ensure the simulation package can be found
 current_dir = os.path.dirname(os.path.abspath(__file__))
 if current_dir not in sys.path:
     sys.path.insert(0, current_dir)
@@ -17,45 +17,45 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 def main():
-    """运行单次模拟，不启动ETL"""
+    """Run a single simulation without starting ETL"""
     logger.info("=" * 80)
-    logger.info("开始简化模拟（不含ETL）")
+    logger.info("Starting simplified simulation (without ETL)")
     logger.info("=" * 80)
     
-    # 1. 初始化SimulationRunner
+    # 1. Initialize SimulationRunner
     simulation = SimulationRunner(scenario_name="601")
-    logger.info(f"模拟初始化成功 - 日期: {simulation.selected_month}月{simulation.selected_day}日")
+    logger.info(f"Simulation initialized successfully - Date: Month {simulation.selected_month}, Day {simulation.selected_day}")
     
-    # 2. 集成数据采集钩子
+    # 2. Integrate data collection hook
     data_hook = integrate_data_collection(simulation, output_dir="./simulation_data")
-    logger.info("数据采集钩子已集成")
+    logger.info("Data collection hook integrated")
     
-    # 3. 运行模拟
+    # 3. Run simulation
     try:
-        logger.info("开始运行模拟...")
+        logger.info("Starting simulation...")
         simulation.run()
-        logger.info("模拟运行完成！")
+        logger.info("Simulation completed successfully!")
     except Exception as e:
-        logger.error(f"模拟运行失败: {e}", exc_info=True)
+        logger.error(f"Simulation run failed: {e}", exc_info=True)
     finally:
-        # 停止数据采集钩子
+        # Stop data collection hook
         try:
             data_hook.stop()
-            logger.info("数据采集钩子已停止")
+            logger.info("Data collection hook stopped")
         except Exception as e:
-            logger.warning(f"停止数据采集钩子失败: {e}")
+            logger.warning(f"Failed to stop data collection hook: {e}")
     
-    # 4. 检查生成的数据文件
+    # 4. Check generated data files
     data_dir = "./simulation_data"
     if os.path.exists(data_dir):
         files = os.listdir(data_dir)
-        logger.info(f"\n生成了 {len(files)} 个数据文件")
+        logger.info(f"\nGenerated {len(files)} data files")
         if files:
-            for i, f in enumerate(files[:10]):  # 只显示前10个
+            for i, f in enumerate(files[:10]):  # Show only first 10
                 size = os.path.getsize(os.path.join(data_dir, f))
                 logger.info(f"  {i+1}. {f} ({size:,} bytes)")
             if len(files) > 10:
-                logger.info(f"  ... 还有 {len(files) - 10} 个文件")
+                logger.info(f"  ... and {len(files) - 10} more files")
 
 if __name__ == "__main__":
     main() 

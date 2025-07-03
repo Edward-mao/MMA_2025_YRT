@@ -1,6 +1,6 @@
 """
-SimPy数据采集钩子模块
-提供实时数据采集和事件处理功能
+SimPy data collection hook module
+Provides real-time data collection and event handling functionality
 """
 
 from .hook import SimPyDataHook, BusEvent

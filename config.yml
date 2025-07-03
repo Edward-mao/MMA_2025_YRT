@@ -14,30 +14,10 @@ paths:
   sumo_scenario:
     config_file: '{scenario_name}/SUMO/simulation.sumocfg'
 scenarios:
-  '050':
-    name: Route 050 - York Region
-    stop_id_mapping_file: data/050/stop_mapping.json
-    target_route_id: '050'
-  096:
-    name: Route 096 - York Region
-    stop_id_mapping_file: data/096/stop_mapping.json
-    target_route_id: 096
   '601':
     name: Route 601 - York Region
     stop_id_mapping_file: data/601/stop_mapping.json
-    target_route_id: '601'
-  '603':
-    name: Route 603 - York Region
-    stop_id_mapping_file: data/603/stop_mapping.json
-    target_route_id: '603'
-  '605':
-    name: Route 605 - York Region
-    stop_id_mapping_file: data/605/stop_mapping.json
-    target_route_id: '605'
-  '607':
-    name: Route 607 - York Region
-    stop_id_mapping_file: data/607/stop_mapping.json
-    target_route_id: '607'
+    target_route_id: 601
 simpy:
   scheduler:
     adaptive:
